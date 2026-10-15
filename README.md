@@ -21,16 +21,16 @@ In most organisations running more than one CI system, build agent setup becomes
 You end up with one Ansible playbook for GitHub Actions, a different set of scripts for Azure
 Pipelines, something cobbled together for TeamCity, and three times the maintenance burden.
 
-I wanted a single framework that provisions identical agents across all three — where the only
+I wanted a single framework that provisions identical agents across all three  where the only
 thing you change is one variable: `ci_system`.
 
 ---
 
 ## What it does
 
-- Provisions self-hosted build agents via **three Ansible roles** — setup, Docker install, and security hardening
+- Provisions self-hosted build agents via **three Ansible roles**  setup, Docker install, and security hardening
 - Packages agents as **Docker images** (base, Python, Node, Java) so the runtime environment is consistent regardless of host
-- Every role is **fully tested with Molecule** — including idempotence checks — before anything touches a real machine
+- Every role is **fully tested with Molecule** including idempotence checks  before anything touches a real machine
 - A **GitHub Actions CI pipeline** lints Dockerfiles, builds all images, and runs pytest on every push
 - Drop-in **ci-config templates** for GitHub Actions, Azure Pipelines, and TeamCity so teams can onboard quickly
 
@@ -60,8 +60,8 @@ graph TB
     end
 
     subgraph Tests["Testing"]
-        K[Molecule — Ansible roles]
-        L[pytest — Docker images]
+        K[Molecule  Ansible roles]
+        L[pytest  Docker images]
     end
 
     Ansible -->|provisions| Images
@@ -70,7 +70,7 @@ graph TB
     Tests -->|validates| Images
 ```
 
-The three Ansible roles are deliberately separate. docker-install and agent-hardening are reusable on any Linux host — not just build agents. Each role has its own Molecule test suite so failures are isolated and easy to debug.
+The three Ansible roles are deliberately separate. docker-install and agent-hardening are reusable on any Linux host  not just build agents. Each role has its own Molecule test suite so failures are isolated and easy to debug.
 
 ## Quick start
 Prerequisites: Ansible >= 2.15, Docker >= 24.0, Python >= 3.10
@@ -85,7 +85,7 @@ ansible-galaxy collection install -r ansible/requirements.yml
 # Build all Docker agent images
 docker compose build
 
-# Provision an agent host — set ci_system to your target
+# Provision an agent host  set ci_system to your target
 ansible-playbook ansible/playbook.yml \
   -i your-host-ip, \
   -e "ci_system=github-actions" \
@@ -95,7 +95,7 @@ ansible-playbook ansible/playbook.yml \
 python3 scripts/health-check.py --ci github-actions
 
 ```
-> Note: Full image builds run cleanly in GitHub Actions CI. Local builds on corporate networks may fail if SSL is intercepted — this does not affect images built in CI.
+> Note: Full image builds run cleanly in GitHub Actions CI. Local builds on corporate networks may fail if SSL is intercepted  this does not affect images built in CI.
 
 ## Docker agent images
 
@@ -107,14 +107,14 @@ python3 scripts/health-check.py --ci github-actions
 | `build-agent:java` | `base` | JDK 17, Maven |
 
 
-All images run as a non-root agent user. The base image is the foundation — the others extend it so you only pay the apt-get cost once.
+All images run as a non-root agent user. The base image is the foundation  the others extend it so you only pay the apt-get cost once.
 
 ## Testing
 There are two layers of tests.
 
-Molecule tests the Ansible roles — does the agent user get created, is the service configured correctly, are file permissions right, and does the role pass idempotence (running it twice produces zero changes).
+Molecule tests the Ansible roles  does the agent user get created, is the service configured correctly, are file permissions right, and does the role pass idempotence (running it twice produces zero changes).
 
-pytest tests the Docker images — is git installed, does the container run as non-root, can the Python image actually execute pytest, can the Java image compile and run a class.
+pytest tests the Docker images  is git installed, does the container run as non-root, can the Python image actually execute pytest, can the Java image compile and run a class.
 
 ```bash
   # Test a specific Ansible role
@@ -127,14 +127,14 @@ pytest tests/ -v
 ```
 I hit two real idempotence bugs during development worth mentioning:
 
-A {{ ansible_date_time.iso8601 }} timestamp in a Jinja2 template — regenerated the file on every run. Fixed by removing the timestamp from the template.
-file module with recurse: true — rescans every file on every run and always reports changed. Fixed by removing recurse and handling ownership separately with changed_when: false.
+A {{ ansible_date_time.iso8601 }} timestamp in a Jinja2 template  regenerated the file on every run. Fixed by removing the timestamp from the template.
+file module with recurse: true  rescans every file on every run and always reports changed. Fixed by removing recurse and handling ownership separately with changed_when: false.
 Molecule caught both before they reached a real machine.
 
 ## CI system integration
 Copy the relevant template from ci-config/ into your project and adjust the pool name, image, and secrets to match your setup.
 
-GitHub Actions — use ci-config/github-actions/build-agent-job.yml
+GitHub Actions  use ci-config/github-actions/build-agent-job.yml
 ```yaml
   jobs:
   build:
@@ -146,7 +146,7 @@ GitHub Actions — use ci-config/github-actions/build-agent-job.yml
       - run: pytest tests/ -v
 
 ```
-Azure Pipelines — use ci-config/azure-pipelines/build-agent-job.yml
+Azure Pipelines  use ci-config/azure-pipelines/build-agent-job.yml
 ```yaml
 pool:
   name: SelfHosted-AgentPool
@@ -154,24 +154,24 @@ steps:
   - script: pytest tests/ -v
 
 ```
-TeamCity — see ci-config/teamcity/build-agent-setup.xml for agent capability properties and registration instructions.
+TeamCity  see ci-config/teamcity/build-agent-setup.xml for agent capability properties and registration instructions.
 
 ## Security hardening
-The agent-hardening role is a standalone role — it works on any Ubuntu host, not just build agents. It applies:
+The agent-hardening role is a standalone role  it works on any Ubuntu host, not just build agents. It applies:
 
 - SSH password authentication disabled
 - fail2ban installed and enabled
-- UFW firewall — deny by default, SSH allowed
+- UFW firewall  deny by default, SSH allowed
 - Agent work directory at 0750, config file at 0600
 - Agent process runs as a dedicated non-root system user
-- Tokens passed at runtime via -e flags or CI secrets — nothing sensitive committed
+- Tokens passed at runtime via -e flags or CI secrets  nothing sensitive committed
 
 ## Operational scripts
 
 | Script | What it does |
 |--------|--------------|
-| [`scripts/bootstrap.sh`](scripts/bootstrap.sh) | Sets up a fresh Ubuntu host from scratch — installs Docker, Python, Ansible, then runs the playbook |
-| [`scripts/health-check.py`](scripts/health-check.py) | Post-deploy validation — checks agent service, Docker daemon, work directory, and config file |
+| [`scripts/bootstrap.sh`](scripts/bootstrap.sh) | Sets up a fresh Ubuntu host from scratch  installs Docker, Python, Ansible, then runs the playbook |
+| [`scripts/health-check.py`](scripts/health-check.py) | Post-deploy validation  checks agent service, Docker daemon, work directory, and config file |
 | [`scripts/cleanup.sh`](scripts/cleanup.sh) | Stops the agent, removes the work directory, optionally removes Docker images |
 
 
@@ -191,7 +191,7 @@ bash scripts/cleanup.sh --all
 - [x] GitHub Actions support
 - [x] Azure Pipelines support
 - [x] TeamCity support
-- [x] Molecule test suite — all three roles
+- [x] Molecule test suite  all three roles
 - [x] Security hardening role
 - [ ] GitLab CI support
 - [ ] AWS CodeBuild support
@@ -200,11 +200,11 @@ bash scripts/cleanup.sh --all
 - [ ] Prometheus metrics endpoint
 
 ## License
-MIT — see LICENSE
+MIT  see LICENSE
 
 <div align="center">
-Built by Megha Bansal — Senior Platform Engineer, Munich
+Built by Megha Bansal  Senior Platform Engineer, Munich
 
-⭐ If this saved you time, a star is appreciated!
+  If this saved you time, a star is appreciated!
 
 </div>

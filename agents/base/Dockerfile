@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 LABEL maintainer="Megha Bansal <bansalmegha.259@gmail.com>"
-LABEL description="CI-agnostic base build agent"
+LABEL description="CI agnostic base build agent"
 
 # Avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive

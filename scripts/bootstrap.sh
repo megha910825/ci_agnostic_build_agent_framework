@@ -36,27 +36,27 @@ log "Detected OS: ${NAME} ${VERSION_ID}"
 if ! command -v docker &>/dev/null; then
     warn "Docker not found — installing..."
     curl -fsSL https://get.docker.com | sh
-    log "Docker installed ✅"
+    log "Docker installed "
 else
-    log "Docker already installed ✅"
+    log "Docker already installed "
 fi
 
 # Check Python3 is installed
 if ! command -v python3 &>/dev/null; then
     warn "Python3 not found — installing..."
     apt-get update && apt-get install -y python3 python3-pip
-    log "Python3 installed ✅"
+    log "Python3 installed "
 else
-    log "Python3 already installed ✅"
+    log "Python3 already installed "
 fi
 
 # Check Ansible is installed
 if ! command -v ansible &>/dev/null; then
     warn "Ansible not found — installing..."
     pip3 install ansible
-    log "Ansible installed ✅"
+    log "Ansible installed "
 else
-    log "Ansible already installed ✅"
+    log "Ansible already installed "
 fi
 
 # Run Ansible playbook
@@ -69,5 +69,5 @@ ansible-playbook ansible/playbook.yml \
     -v
 
 log ""
-log "✅ Build agent bootstrap complete!"
+log "Build agent bootstrap complete!"
 log "Run: python3 scripts/health-check.py --ci ${CI_SYSTEM}"

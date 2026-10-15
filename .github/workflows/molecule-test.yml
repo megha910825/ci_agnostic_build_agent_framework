@@ -11,7 +11,7 @@ on:
 
 jobs:
   molecule:
-    name: Molecule — ${{ matrix.role }}
+    name: Molecule  ${{ matrix.role }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -46,7 +46,7 @@ jobs:
             community.docker \
             ansible.posix
 
-      - name: Run Molecule tests — ${{ matrix.role }}
+      - name: Run Molecule tests  ${{ matrix.role }}
         run: |
           cd ansible/roles/${{ matrix.role }}
           molecule test

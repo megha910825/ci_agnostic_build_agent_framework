@@ -64,7 +64,7 @@ def run_health_checks(ci_system: str) -> bool:
 
     for check in CHECKS:
         passed, message = check.check_fn()
-        status = "✅" if passed else ("❌" if check.critical else "⚠️")
+        status = "" if passed else ("" if check.critical else "")
         print(f"{status}  {check.name}: {message}")
 
         if not passed and check.critical:
@@ -72,9 +72,9 @@ def run_health_checks(ci_system: str) -> bool:
 
     print("-" * 50)
     if all_passed:
-        print("\n✅ All critical checks passed — agent is healthy!\n")
+        print("\n All critical checks passed  agent is healthy!\n")
     else:
-        print("\n❌ One or more critical checks failed — agent needs attention!\n")
+        print("\n One or more critical checks failed  agent needs attention!\n")
 
     return all_passed
 

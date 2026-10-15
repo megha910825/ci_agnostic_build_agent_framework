@@ -1,7 +1,7 @@
 FROM build-agent:base
 
 LABEL maintainer="Megha Bansal <bansalmegha.259@gmail.com>"
-LABEL description="CI-agnostic Java build agent"
+LABEL description="CI agnostic Java build agent"
 
 USER root
 

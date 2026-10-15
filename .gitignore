@@ -1,4 +1,4 @@
-# Python virtual environment — NEVER commit this
+# Python virtual environment  NEVER commit this
 venv/
 .venv/
 env/
@@ -37,7 +37,7 @@ molecule/.cache/
 *.swo
 .DS_Store
 
-# Environment variables — NEVER commit secrets
+# Environment variables  NEVER commit secrets
 .env
 .env.*
 *.env

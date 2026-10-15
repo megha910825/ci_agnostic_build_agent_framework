@@ -1,7 +1,7 @@
 FROM build-agent:base
 
 LABEL maintainer="Megha Bansal <bansalmegha.259@gmail.com>"
-LABEL description="CI-agnostic Python build agent"
+LABEL description="CI agnostic Python build agent"
 
 USER root
 

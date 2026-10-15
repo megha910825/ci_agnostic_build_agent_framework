@@ -1,4 +1,4 @@
-name: CI — Build and Test Agents
+name: CI Build and Test Agents
 
 on:
   push:
